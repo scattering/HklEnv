@@ -1,1 +1,1 @@
-from gym.envs.crystals.hkl import HklEnv
+from HklEnv.envs.hkl import HklEnv
