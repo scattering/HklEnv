@@ -4,5 +4,5 @@ from gym.envs.registration import registry, register, make, spec
 # ----------------------------------------
 register(
     id='hkl-v0',
-    entry_point='gym.envs.crystals:HklEnv',
+    entry_point='HklEnv.envs.hkl:HklEnv',
 )
