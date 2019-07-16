@@ -122,6 +122,11 @@ class HklEnv(gym.Env):
         self.zs = []
         self.storspot = storspot
         self.envRank = 0
+        self.repeats = 0
+        self.repeatDeduction = 100000 #change me below!
+        self.repeatDecay = 1
+        self.epRepeats = []
+        self.totReward = 0
 
         self.observation_space = spaces.Bin_Discrete(len(self.refList))
         self.action_space = spaces.Discrete(len(self.refList))
@@ -135,13 +140,26 @@ class HklEnv(gym.Env):
         
 
     def step(self, actions):
-        #print("stepping")
+        #print("                                 stepping")
         #raise Hell
+        reward = -self.reward_scale
         chisq = None
         dz =None
-
+        repeatPunish = False
         self.steps += 1
-       
+        self.repeatDeduction = self.repeatDecay *  self.repeatDeduction
+        for idx in range(0, len(self.visited)):
+            if self.visited[idx] == self.refList[int(actions)]:
+                print("repeat!")
+                print("         curr reward:", self.totReward)
+                
+                
+                self.repeats += 1
+                #repeatPunish = True
+                reward -= self.repeatDeduction
+                print("         new reward:",self.totReward + reward)
+                #return self.state, reward, False, {}
+                break
         #No repeats
         self.visited.append(self.refList[int(actions)])
         self.state[int(actions)] = 1
@@ -161,24 +179,25 @@ class HklEnv(gym.Env):
         self.model.update()
         self.hkls.append(self.refList[actions.tolist()].hkl)
         self.zs.append(self.model.atomListModel.atomModels[0].z.value)
-        reward = -self.reward_scale
+        #reward = -self.reward_scale
         #print('reward',reward)
         #print(str(self.model))
         #Need more data than parameters, have to wait to the second step to fit
-        if len(self.visited) > 1:
-            #print("about to fit")
+        if len(self.visited) > 2:
+            #print(" about to fit")
             
             try:
                 x, dx, chisq, params = self.fit(self.model)
             except ValueError:
                 print('FAILLLLLLL    ',self.model.refList)
                 print('actions', actions)
-                #print('visted:                  ', self.visited)
-                raise ValueError 
+                print('visted:                  ', self.hkls)
+                print('visted length (actions???):                  ', len(self.hkls))
+                pass
             #'name': 'Pr z'
             dz=params[0].dx
             if self.prevDx != None and dz < self.prevDx:
-                reward=1/dz
+                reward+=1/dz
                 #print('reward',dz)
                 
             self.prevDx=dz
@@ -188,44 +207,51 @@ class HklEnv(gym.Env):
 
             #self.prevChisq = chisq
         
-        for idx in range(0, len(self.visited)):
-            if self.visited[idx] == self.refList[int(actions)]:
-                #print("repeat")
-                self.totReward -= 10000
-                break
+        
                 
         self.totReward += reward
         
         
-
+        
         if (self.prevChisq != None and len(self.visited) > 50 and chisq < 5):
             self.episodeNum += 1
-            filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            np.savetxt(filename, self.hkls)
-            #file.write("episode: " + str(self.episodeNum))
-            #file.write(str(self.hkls))
-            #file.close()
+            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
+            #np.savetxt(filename, self.hkls)
+            file.write(str(self.hkls))
+            file.close()
             filename = "/wrk/kmm11/" + self.storspot +"/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
             np.savetxt(filename, self.zs)
-            #print("/wrk/kmm11/" + self.storspot +"/zLog-" + str(self.episodeNum) + "e" + str(self.envRank) + ".txt")
-            #file.write("episode: " + str(self.episodeNum))
-            #file.write(str(self.zs))
-            #file.close()
+
+            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
+            self.epRepeats.append(self.repeats)
+            np.savetxt(filename, self.epRepeats)
             return self.state, 1, True, {"chi": self.prevChisq, "z": self.model.atomListModel.atomModels[0].z.value, "hkl": self.refList[actions].hkl}
         if (len(self.remainingActions) == 0 or self.steps > 100):
             terminal = True
             self.episodeNum += 1
-            filename = "/wrk/kmm11/" + self.storspot + "/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            np.savetxt(filename, self.hkls)
-            #print("/wrk/kmm11/" + self.storspot +"/zLog-" + str(self.episodeNum) + "e" + str(self.envRank) + ".txt")
-            #file.write("episode: " + str(self.episodeNum))
-            #file.write(str(self.hkls))
-            #file.close()
+            #filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+            #np.savetxt(filename, self.hkls)
+            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
+            file.write(str(self.hkls))
+            file.close()
             filename = "/wrk/kmm11/" + self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
             np.savetxt(filename, self.zs)
-            #file.write("episode: " + str(self.episodeNum))
-            #file.write(str(self.zs))
-            #file.close()
+            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
+            self.epRepeats.append(self.repeats)
+            np.savetxt(filename, self.epRepeats)
+        elif repeatPunish:
+            self.episodeNum += 1
+            #filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+            #np.savetxt(filename, self.hkls)
+            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
+            file.write(str(self.hkls))
+            file.close()
+            filename = "/wrk/kmm11/" + self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+            np.savetxt(filename, self.zs)
+            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
+            self.epRepeats.append(self.repeats)
+            np.savetxt(filename, self.epRepeats)
+            terminal = True
         else:
             terminal = False
 
@@ -249,7 +275,11 @@ class HklEnv(gym.Env):
         self.observed = []
         self.hkls = []
         self.zs = []
+        self.repeatDeduction = 100000
+        self.repeats = 0
         self.remainingActions = []
+        self.totReward = 0
+        
         for i in range(len(self.refList)):
             self.remainingActions.append(i)
 
