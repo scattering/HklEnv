@@ -1,3 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-setup(name='HklEnv', version='0.0.1', install_requires=['gym'])
+packages = find_packages()
+setup(
+    name='HklEnv', 
+    version='0.0.1', 
+    packages=packages, 
+    install_requires=['gym', 'baselines'],
+)

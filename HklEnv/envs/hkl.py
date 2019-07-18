@@ -1,111 +1,46 @@
-import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
-from os import path
 import os
-import gym
-from gym import spaces
-from gym.utils import seeding
+from os import path
 from copy import copy
-import numpy as np
 import random as rand
 import pickle
 import itertools
+
+import gym
+import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.axes as axes
-
-import fswig_hklgen as H
-import hkl_model as Mod
-import sxtal_model as S
+from gym import spaces
+from gym.utils import seeding
 
 import bumps.names as bumps
 import bumps.fitters as fitters
 import bumps.lsqerror as lsqerror
 from bumps.formatnum import format_uncertainty_pm
 
-#from tensorforce.environments import Environment
+import hklgen
+from hklgen import fswig_hklgen as H
+from hklgen import hkl_model as Mod
+from hklgen import sxtal_model as S
 
-def profile(fn, *args, **kw):
-    """
-    Profile a function called with the given arguments.
-    """
-    import cProfile
-    import pstats
-
-    print("in profile", fn, args, kw)
-    result = [None]
-    def call():
-        try:
-            result[0] = fn(*args, **kw)
-        except BaseException as exc:
-            result.append(exc)
-    datafile = 'profile.out'
-    cProfile.runctx('call()', dict(call=call), {}, datafile)
-    stats = pstats.Stats(datafile)
-    # order='calls'
-    order = 'cumulative'
-    # order='pcalls'
-    # order='time'
-    stats.sort_stats(order)
-    stats.print_stats()
-    os.unlink(datafile)
-    if len(result) > 1:
-        raise result[1]
-    return result[0]
-    
-class Profiler(object):
-    def __init__(self,  fn, datafile='profile.out'):
-        self.fn = fn
-        self.datafile = datafile
-        self.first = True
-        
-    def __call__(self, *args, **kw):
-        #print("in call", self, args, kw, self.fn)
-        if self.first:
-            self.first = False
-            import cProfile
-            
-            result = [None]
-            def call():
-                result[0] = self.fn(fn, *args, **kw)
-            
-            cProfile.runctx('call()', dict(call=call), {}, self.datafile)
-            self.summarize()
-            return result[0]
-        else:
-            return self.fn(*args, **kw)
-            
-    def summarize(self):
-        """
-        Profile a function called with the given arguments.
-        """
-        import pstats, sys
-
-        with open("stats.out", "w") as stream:
-            stats = pstats.Stats(self.datafile, stream=stream)
-            # order='calls'
-            order = 'cumulative'
-            # order='pcalls'
-            # order='time'
-            stats.sort_stats(order)
-            stats.print_stats()
-        
-    def cleanup():
-        self.summarize()
-        os.unlink(self.datafile)
-
+DATAPATH = os.environ.get('HKL_DATAPATH', None)
+if DATAPATH is None:
+    DATAPATH = os.path.join(os.path.abspath(os.path.dirname(hklgen.__file__)),
+                            'examples', 'sxtal')
 
 class HklEnv(gym.Env):
 
-    def __init__(self, reward_scale=1e3, storspot = "ppodat"):
+    def __init__(self, reward_scale=1e3, storspot="ppodat"):
         #self._first = True
         self.reward_scale=reward_scale
-        print("envmade")
-        import sys; sys.stdout.flush()
-        DATAPATH = os.path.abspath("/home/kmm11/pycrysfml/hklgen/examples/sxtal")
+        print("Loading problem from %r. Set HklEnv.hkl.DATAPATH"
+              " or os.environ['HKL_DATAPATH'] to override." % DATAPATH)
         observedFile = os.path.join(DATAPATH,r"prnio.int")
         infoFile = os.path.join(DATAPATH,r"prnio.cfl")
 
+        print("look for storspot in available attrs", dir(self))
+        print("args", getattr(self, 'args', None), getattr(self, 'extra_args', None))
         #Read data
         self.spaceGroup, self.crystalCell, self.atomList = H.readInfo(infoFile)
 
@@ -212,46 +147,33 @@ class HklEnv(gym.Env):
         self.totReward += reward
         
         
-        
-        if (self.prevChisq != None and len(self.visited) > 50 and chisq < 5):
-            self.episodeNum += 1
-            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
-            #np.savetxt(filename, self.hkls)
-            file.write(str(self.hkls))
-            file.close()
-            filename = "/wrk/kmm11/" + self.storspot +"/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            np.savetxt(filename, self.zs)
+        def snapshot():
+            path = self.storspot if self.storspot else "."
+            filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
+            print("saving to", filename)
+            with open(os.path.join(path, filename), "w+") as fid:
+                file.write(str(self.hkls))
+            filename = "zLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
+            np.savetxt(os.path.join(path, filename), self.zs)
+            filename = "repeats-%d.txt" % self.envRank + ".txt"
+            np.savetxt(os.path.join(path, filename), self.epRepeats)
 
-            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
+        if self.prevChisq is not None and len(self.visited) > 50 and chisq < 5:
+            self.episodeNum += 1
             self.epRepeats.append(self.repeats)
-            np.savetxt(filename, self.epRepeats)
+            snapshot()
             return self.state, 1, True, {"chi": self.prevChisq, "z": self.model.atomListModel.atomModels[0].z.value, "hkl": self.refList[actions].hkl}
-        if (len(self.remainingActions) == 0 or self.steps > 100):
+
+        if len(self.remainingActions) == 0 or self.steps > 100:
             terminal = True
             self.episodeNum += 1
-            #filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            #np.savetxt(filename, self.hkls)
-            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
-            file.write(str(self.hkls))
-            file.close()
-            filename = "/wrk/kmm11/" + self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            np.savetxt(filename, self.zs)
-            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
             self.epRepeats.append(self.repeats)
-            np.savetxt(filename, self.epRepeats)
+            snapshot()
         elif repeatPunish:
-            self.episodeNum += 1
-            #filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            #np.savetxt(filename, self.hkls)
-            file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
-            file.write(str(self.hkls))
-            file.close()
-            filename = "/wrk/kmm11/" + self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-            np.savetxt(filename, self.zs)
-            filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
-            self.epRepeats.append(self.repeats)
-            np.savetxt(filename, self.epRepeats)
             terminal = True
+            self.episodeNum += 1
+            self.epRepeats.append(self.repeats)
+            snapshot()
         else:
             terminal = False
 
@@ -326,6 +248,4 @@ class HklEnv(gym.Env):
     @property
     def actions(self):
         return dict(num_actions=len(self.refList), type='int')
-
-
 
