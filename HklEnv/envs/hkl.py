@@ -5,14 +5,16 @@ import random as rand
 import pickle
 import itertools
 
-import gym
 import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.axes as axes
-from gym import spaces
+
+import gym
 from gym.utils import seeding
+from gym.spaces import Discrete
+from baselines.spaces import Bin_Discrete
 
 import bumps.names as bumps
 import bumps.fitters as fitters
@@ -63,8 +65,8 @@ class HklEnv(gym.Env):
         self.epRepeats = []
         self.totReward = 0
 
-        self.observation_space = spaces.Bin_Discrete(len(self.refList))
-        self.action_space = spaces.Discrete(len(self.refList))
+        self.observation_space = Bin_Discrete(len(self.refList))
+        self.action_space = Discrete(len(self.refList))
 
         self.episodeNum = 0
         
