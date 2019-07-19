@@ -23,7 +23,7 @@ Install openai gym into your python enviroment as:
 We depend on our own fork of openai baselines, which can be installed from the git repo as:
 
     git clone https://github.com/scattering/baselines.git
-    pip install -e .
+    (cd baselines && pip install -e .)
 
 or directly from pip as:
 
@@ -33,15 +33,15 @@ Need pycrysfml installed from source:
 
     git clone https://github.com/scattering/pycrysfml.git
     cd pycrysfml
-    git checkout python3
     # ... may need to modify machine environment in build.sh ...
     ./build.sh
     pip install -e .
+    cd ..
 
 Finally, change into this source directory and type:
 
     git clone https://github.com/scattering/HklEnv.git
-    pip install -e .
+    (cd HklEnv && pip install -e .)
 
 which installs hkl as an edittable environment in the gym.
 
