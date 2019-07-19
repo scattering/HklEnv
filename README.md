@@ -4,11 +4,19 @@ An evnvironment for a reinforcement learning approach to faster crystallographic
 
 ## Installation
 
-Install the usual numpy, matplotlib, scipy, h5py environment.
+Build a new python environment with the usual numpy, matplotlib, scipy, h5py.  Using an HPC systems with an anaconda module, this would be something like:
 
-Install the appropriate tensorflow / tensorflow-gpu.
+    module load anaconda3
+    conda create -n hklgym numpy matplotlib scipy h5py
 
-Install openai gym as:
+Install the appropriate tensorflow / tensorflow-gpu.  On IBM power architecture, the base tensorflow packages are much too old, but you maybe can use
+the IBM powerai anaconda channel:
+
+    conda config --prepend channels https://public.dhe.ibm.com/ibmdl/export/pub/software/server/ibm-ai/conda/
+    source activate hklgym
+    conda install tensorflow-gpu
+
+Install openai gym into your python enviroment as:
 
     pip install gym
 
@@ -42,6 +50,25 @@ To run HklEnv on a particular problem, define the configuration files in a datap
     HKL_DATAPATH=/path/to/problem
 
 Default is "pycrysfml/hklgen/examples/sxtal".
+
+Run a training example on the new hkl environment:
+
+    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --storspot=howdy --num_env=1
+
+Normally this command would be part of a slurm batch script, run.sh:
+
+    #!/bin/bash
+    #SBATCH -c 40
+    #SBATCH --gres=gpu:3
+    #SBATCH --partition=gpu
+    #SBATCH --time=96:00:00
+    module load anaconda3
+    source activate hklgym
+    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --storspot=howdy --num_env=1
+
+submit using
+
+    sbatch run.sh
 
 ## Problems
 

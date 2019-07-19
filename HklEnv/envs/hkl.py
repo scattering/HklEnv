@@ -41,8 +41,6 @@ class HklEnv(gym.Env):
         observedFile = os.path.join(DATAPATH,r"prnio.int")
         infoFile = os.path.join(DATAPATH,r"prnio.cfl")
 
-        print("look for storspot in available attrs", dir(self))
-        print("args", getattr(self, 'args', None), getattr(self, 'extra_args', None))
         #Read data
         self.spaceGroup, self.crystalCell, self.atomList = H.readInfo(infoFile)
 
@@ -69,12 +67,12 @@ class HklEnv(gym.Env):
         self.action_space = Discrete(len(self.refList))
 
         self.episodeNum = 0
-        
+
         self.reset()
 
     def epStep(self):
         self.episodeNum += 1
-        
+
 
     def step(self, actions):
         #print("                                 stepping")
@@ -89,8 +87,8 @@ class HklEnv(gym.Env):
             if self.visited[idx] == self.refList[int(actions)]:
                 print("repeat!")
                 print("         curr reward:", self.totReward)
-                
-                
+
+
                 self.repeats += 1
                 #repeatPunish = True
                 reward -= self.repeatDeduction
@@ -102,12 +100,12 @@ class HklEnv(gym.Env):
         self.state[int(actions)] = 1
         #print(actions)
         #self.remainingActions.remove(actions)
-       
+
 
         #Find the data for this hkl value and add it to the model
         self.model.refList = H.ReflectionList(self.visited)
         self.model._set_reflections()
-        
+
         self.model.error.append(self.error[actions])
         self.model.tt = np.append(self.model.tt, [self.tt[actions]])
 
@@ -122,7 +120,7 @@ class HklEnv(gym.Env):
         #Need more data than parameters, have to wait to the second step to fit
         if len(self.visited) > 2:
             #print(" about to fit")
-            
+
             try:
                 x, dx, chisq, params = self.fit(self.model)
             except ValueError:
@@ -136,19 +134,19 @@ class HklEnv(gym.Env):
             if self.prevDx != None and dz < self.prevDx:
                 reward+=1/dz
                 #print('reward',dz)
-                
+
             self.prevDx=dz
 
             #if (self.prevChisq != None and chisq < self.prevChisq):
             #    reward = 1/(chisq*10)
 
             #self.prevChisq = chisq
-        
-        
-                
+
+
+
         self.totReward += reward
-        
-        
+
+
         def snapshot():
             path = self.storspot if self.storspot else "."
             filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
@@ -203,7 +201,7 @@ class HklEnv(gym.Env):
         self.repeats = 0
         self.remainingActions = []
         self.totReward = 0
-        
+
         for i in range(len(self.refList)):
             self.remainingActions.append(i)
 
@@ -219,7 +217,7 @@ class HklEnv(gym.Env):
 
     def giveRank(self, subrank):
         self.envRank = subrank
-    
+
     def fit(self, model):
 
         #Create a problem from the model with bumps,
@@ -230,7 +228,7 @@ class HklEnv(gym.Env):
         for p, v in zip(problem._parameters, result.dx):
             p.dx = v
         return result.x, result.dx, problem.chisq(), problem._parameters
-        
+
         """   # Dead code
         fitted = fitters.LevenbergMarquardtFit(problem)
         x, fx = fitted.solve()
