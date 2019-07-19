@@ -24,8 +24,8 @@ or directly from pip as:
 Need pycrysfml installed from source:
 
     git clone https://github.com/scattering/pycrysfml.git
-    git checkout python3
     cd pycrysfml
+    git checkout python3
     # ... may need to modify machine environment in build.sh ...
     ./build.sh
     pip install -e .
