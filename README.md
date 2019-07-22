@@ -53,7 +53,7 @@ Default is "pycrysfml/hklgen/examples/sxtal".
 
 Run a training example on the new hkl environment:
 
-    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --storspot=howdy --num_env=1
+    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --num_env=1
 
 Normally this command would be part of a slurm batch script, run.sh:
 
@@ -64,7 +64,7 @@ Normally this command would be part of a slurm batch script, run.sh:
     #SBATCH --time=96:00:00
     module load anaconda3
     source activate hklgym
-    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --storspot=howdy --num_env=1
+    python3 -m baselines.run --alg=a2c --env=HklEnv:hkl-v0 --num_timesteps=2e16 --log_path=~/logs/hklstest/ --num_env=1
 
 submit using
 

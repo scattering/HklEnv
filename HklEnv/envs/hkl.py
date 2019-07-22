@@ -33,7 +33,7 @@ if DATAPATH is None:
 
 class HklEnv(gym.Env):
 
-    def __init__(self, reward_scale=1e3, storspot="ppodat"):
+    def __init__(self, reward_scale=1e3):
         #self._first = True
         self.reward_scale=reward_scale
         print("Loading problem from %r. Set HklEnv.hkl.DATAPATH"
@@ -55,7 +55,6 @@ class HklEnv(gym.Env):
         self.exclusions = []
         self.hkls = []
         self.zs = []
-        self.storspot = storspot
         self.envRank = 0
         self.repeats = 0
         self.repeatDeduction = 100000 #change me below!
@@ -148,7 +147,8 @@ class HklEnv(gym.Env):
 
 
         def snapshot():
-            path = self.storspot if self.storspot else "."
+            # TODO: override output path
+            path = "."
             filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
             print("saving to", filename)
             with open(os.path.join(path, filename), "w+") as fid:
