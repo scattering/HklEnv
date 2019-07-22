@@ -152,7 +152,7 @@ class HklEnv(gym.Env):
             filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
             print("saving to", filename)
             with open(os.path.join(path, filename), "w+") as fid:
-                file.write(str(self.hkls))
+                fid.write(str(self.hkls))
             filename = "zLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
             np.savetxt(os.path.join(path, filename), self.zs)
             filename = "repeats-%d.txt" % self.envRank + ".txt"
