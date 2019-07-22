@@ -149,13 +149,13 @@ class HklEnv(gym.Env):
         def snapshot():
             # TODO: override output path
             path = "."
-            filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
+            filename = "hklLog-%d_%d.txt" % (self.episodeNum, self.envRank)
             print("saving to", filename)
             with open(os.path.join(path, filename), "w+") as fid:
                 fid.write(str(self.hkls))
-            filename = "zLog-%d_%d.txt" % (self.episodeNum, self.envRank) + ".txt"
+            filename = "zLog-%d_%d.txt" % (self.episodeNum, self.envRank)
             np.savetxt(os.path.join(path, filename), self.zs)
-            filename = "repeats-%d.txt" % self.envRank + ".txt"
+            filename = "repeats-%d.txt" % self.envRank
             np.savetxt(os.path.join(path, filename), self.epRepeats)
 
         if self.prevChisq is not None and len(self.visited) > 50 and chisq < 5:
