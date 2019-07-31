@@ -1,4 +1,4 @@
-import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
+
 from os import path
 import os
 import gym 
@@ -104,7 +104,7 @@ class HklEnv(gym.Env):
         self.reward_scale=reward_scale
         print("envmade")
         import sys; sys.stdout.flush()
-        DATAPATH = os.path.abspath("/home/kmm11/pycrysfml/hklgen/examples/sxtal")
+        DATAPATH = os.path.abspath(os.path.expanduser("~/pycrysfml/hklgen/examples/sxtal"))
         observedFile = os.path.join(DATAPATH,r"prnio.int")
         infoFile = os.path.join(DATAPATH,r"prnio.cfl")
 
@@ -125,7 +125,7 @@ class HklEnv(gym.Env):
         self.hs = []
         self.ks = []
         self.ls = []
-        self.storspot = storspot
+        self.storspot = "/wrk/kmm11/" + storspot
         self.envRank = 0
         self.repeats = 0
         self.repeatDeductionTemp = 100000
@@ -329,33 +329,33 @@ class HklEnv(gym.Env):
         self.batch = batch
         
     def log(self):
-        #filename = "/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        #filename = self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         #np.savetxt(filename, self.hkls)
-        file = open("/wrk/kmm11/" + self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
+        file = open(self.storspot +"/hklLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt", "w+")
         file.write(str(self.hkls))
         file.close()
         
-        filename = "/wrk/kmm11/" + self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        filename = self.storspot + "/zLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         np.savetxt(filename, self.zs)
         
-        filename = "/wrk/kmm11/" + self.storspot + "/repeats-" + str(self.envRank) + ".txt"
+        filename = self.storspot + "/repeats-" + str(self.envRank) + ".txt"
         self.epRepeats.append(self.repeats)
         np.savetxt(filename, self.epRepeats)
         
-        filename = "/wrk/kmm11/" + self.storspot +"/hLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        filename = self.storspot +"/hLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         np.savetxt(filename, self.hs)
         
-        filename = "/wrk/kmm11/" + self.storspot +"/kLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        filename = self.storspot +"/kLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         np.savetxt(filename, self.ks)
         
-        filename = "/wrk/kmm11/" + self.storspot +"/lLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        filename = self.storspot +"/lLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         np.savetxt(filename, self.ls)
         
         print("ENDED EPISODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         
         if self.totReward < 1e8:
             self.rewards.append(self.totReward)
-            filename = "/wrk/kmm11/" + self.storspot +"/rewardLog-" +  str(self.envRank) + ".txt"
+            filename = self.storspot +"/rewardLog-" +  str(self.envRank) + ".txt"
             np.savetxt(filename, self.rewards)      
         
     def fit(self, model):
