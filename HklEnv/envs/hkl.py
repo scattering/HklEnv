@@ -1,4 +1,3 @@
-
 from os import path
 import os
 import gym 
@@ -15,17 +14,18 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.axes as axes
 
-import fswig_hklgen as H
-import hkl_model as Mod
-import sxtal_model as S
-from test_bumps_refl import better_bumps
-
 import bumps.names as bumps
 import bumps.fitters as fitters
 import bumps.lsqerror as lsqerror
 from bumps.formatnum import format_uncertainty_pm
 
+import hklgen
+from hklgen import fswig_hklgen as H
+from hklgen import hkl_model as Mod
+from hklgen import sxtal_model as S
 #from tensorforce.environments import Environment
+
+from .test_bumps_refl import better_bumps
 
 def profile(fn, *args, **kw):
     """
