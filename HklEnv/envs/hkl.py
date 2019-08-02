@@ -100,7 +100,7 @@ class Profiler(object):
 
 class HklEnv(gym.Env):
 
-    def __init__(self, reward_scale=1e2, storspot = "ppodat"):
+    def __init__(self, reward_scale=20, storspot = "ppodat"):
         #self._first = True
         self.reward_scale=reward_scale
         print("envmade")
@@ -135,6 +135,8 @@ class HklEnv(gym.Env):
         self.epRepeats = []
         self.totReward = 0
         self.rewards = []
+        self.prevChisq = None
+        self.chisqds = []
         self.observation_space = base_spaces.Bin_Discrete(len(self.refList))
         self.action_space = gym_spaces.Discrete(len(self.refList))
         
@@ -224,16 +226,22 @@ class HklEnv(gym.Env):
             #'name': 'Pr z'
             dz=params[0].dx
             #reward += 1/abs(x - 0.35973)[0]
-            if chisq <10:
-                reward += 1000
-                if dz < 1e-4:
-                    reward+=1/dz
-            self.prevDx=dz
+            print("chi squared: ", chisq)
+            print("dz :", dz)
             
-            #if (self.prevChisq != None and chisq < self.prevChisq):
-            #    reward = 1/(chisq*10)
+            # if chisq <10:
+                # reward += 1000
+                # if dz < 2e-3:
+                    # reward+=1/dz
+            # self.prevDx=dz
+            
+            if (self.prevChisq != None and chisq < self.prevChisq):
+                reward += 1/(chisq)
 
-            #self.prevChisq = chisq
+            self.prevChisq = chisq
+            
+            self.chisqds.append(chisq)
+            
         
         
                 
@@ -265,7 +273,7 @@ class HklEnv(gym.Env):
         
         print("valid actions:           ", invalid_actions)
         
-        if (self.prevChisq != None and len(self.visited) > 50 and chisq < 5):
+        if (self.prevChisq != None and len(self.visited) > 10 and chisq < 0.05):
             self.episodeNum += 1
             self.log()
             return self.state, 1, True, {"chi": self.prevChisq, "z": self.model.atomListModel.atomModels[0].z.value, "hkl": self.refList[int(actions)].hkl, 'valid_actions': self.valid_actions}
@@ -299,6 +307,7 @@ class HklEnv(gym.Env):
         self.hs = []
         self.ks = []
         self.ls = []
+        self.chisqds = []
         self.valid_actions = np.ones(shape = (5, len(self.refList)))
         self.repeatDeductionTemp
         self.repeats = 0
@@ -343,14 +352,17 @@ class HklEnv(gym.Env):
         self.epRepeats.append(self.repeats)
         np.savetxt(filename, self.epRepeats)
         
-        filename = self.storspot +"/hLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-        np.savetxt(filename, self.hs)
+        # filename = self.storspot +"/hLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        # np.savetxt(filename, self.hs)
         
-        filename = self.storspot +"/kLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
-        np.savetxt(filename, self.ks)
+        # filename = self.storspot +"/kLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        # np.savetxt(filename, self.ks)
         
         filename = self.storspot +"/lLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
         np.savetxt(filename, self.ls)
+        
+        filename = self.storspot +"/chiLog-" + str(self.episodeNum) + "_" + str(self.envRank) + ".txt"
+        np.savetxt(filename, self.chisqds)
         
         print("ENDED EPISODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         
