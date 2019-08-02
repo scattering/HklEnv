@@ -1,3 +1,4 @@
+import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
 import numpy as N
 import pylab
 import matplotlib.pyplot as plt

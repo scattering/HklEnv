@@ -1,3 +1,5 @@
+import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
+
 from os import path
 import os
 import gym 
@@ -19,13 +21,12 @@ import bumps.fitters as fitters
 import bumps.lsqerror as lsqerror
 from bumps.formatnum import format_uncertainty_pm
 
-import hklgen
-from hklgen import fswig_hklgen as H
-from hklgen import hkl_model as Mod
-from hklgen import sxtal_model as S
+import fswig_hklgen as H
+import hkl_model as Mod
+import sxtal_model as S
 #from tensorforce.environments import Environment
 
-from .test_bumps_refl import better_bumps
+from HklEnv.envs.test_bumps_refl import better_bumps
 
 def profile(fn, *args, **kw):
     """
@@ -222,7 +223,7 @@ class HklEnv(gym.Env):
             
             #'name': 'Pr z'
             dz=params[0].dx
-            reward += 1/abs(x - 0.35973)[0]
+            #reward += 1/abs(x - 0.35973)[0]
             if chisq <10:
                 reward += 1000
                 if dz < 1e-4:
@@ -268,7 +269,7 @@ class HklEnv(gym.Env):
             self.episodeNum += 1
             self.log()
             return self.state, 1, True, {"chi": self.prevChisq, "z": self.model.atomListModel.atomModels[0].z.value, "hkl": self.refList[int(actions)].hkl, 'valid_actions': self.valid_actions}
-        if (len(self.remainingActions) == 0 or self.steps > 100):
+        if (len(self.remainingActions) == 0 or self.steps > 30):
             terminal = True
             self.episodeNum += 1
             self.log()
