@@ -36,8 +36,8 @@ def better_bumps(model):
         schi=model.nllf()
         nllfs.append(schi)
         zin.append(zs)
-
-    xpeaks = findmin(zin,nllfs,10) #these lines are calling stuff from find_min.py
+    
+    xpeaks = findmin(zin,nllfs,10)
     print('xpeak', xpeaks)
     model.atomListModel.atomModels[0].z.value = zin[xpeaks[0]]
     model.update()
