@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 #This filename is where the results have been stored (storspot)
 filename = "/wrk/kmm11/howdy/"
+
+#Choose a folder to store results in
+imagestore = "/home/kmm11/resultimgs/"
 
 #initial file load
 numTrials = 128
@@ -41,20 +45,20 @@ for j in range (0, len(data)):
         lzeroes.append(l.count(0))
     plt.xlabel("measurement steps")
     plt.ylabel("z value")
-    plt.savefig("zs.png")
+    plt.savefig(imagestore + "zs.png")
     plt.close()
     
     
 plt.plot(convergs, 'ro')
 plt.xlabel("episodes")
 plt.ylabel("step at which convergence is reached")
-plt.savefig("convergs.png")    
+plt.savefig(imagestore + "convergs.png")    
 plt.close()
 
 plt.plot(lzeroes, 'ko')
 plt.xlabel("episodes")
 plt.ylabel("num l zeroes")
-plt.savefig("lzeroes.png")
+plt.savefig(imagestore + "lzeroes.png")
 plt.close()
     
 for i in range (start_trial, len(endzs)):
@@ -62,7 +66,7 @@ for i in range (start_trial, len(endzs)):
     plt.xlabel("episodes")
     plt.ylabel("z value")
 
-plt.savefig("endzs.png")
+plt.savefig(imagestore + "endzs.png")
 plt.close()
     
 '''
@@ -87,7 +91,7 @@ for j in range (0, len(data)):
         plt.plot(ls[j][i], 'mo')
     plt.xlabel("measurement steps")
     plt.ylabel("ls")
-    plt.savefig("ls.png")
+    plt.savefig(imagestore + "ls.png")
     plt.close()
     
 for j in range (0, len(data)):
@@ -95,5 +99,5 @@ for j in range (0, len(data)):
         plt.plot(chis[j][i], 'co')
     plt.xlabel("measurement steps")
     plt.ylabel("chis")
-    plt.savefig("chis" + str(j) + ".png")
+    plt.savefig(imagestore + "chis" + str(j) + ".png")
     plt.close()
