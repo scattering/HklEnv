@@ -1,5 +1,5 @@
 # HklEnv
-An evnvironment for a reinforcement learning approach to faster crystallographic measurements using Proximal Policy Optimization 2 from OpenAI baselines
+An environment for a reinforcement learning approach to faster crystallographic measurements using Actor-Critic (A2C) from OpenAI baselines
 
 
 ## Installation
@@ -48,6 +48,7 @@ which installs hkl as an edittable environment in the gym.
 To run HklEnv on a particular problem, define the configuration files in a datapath and set the following os environment variable:
 
     HKL_DATAPATH=/path/to/problem
+    HKL_STOREPATH=/path/to/save
 
 Default is "pycrysfml/hklgen/examples/sxtal".
 

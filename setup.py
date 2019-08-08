@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
-
-packages = find_packages()
+print("packages:", find_packages())
 setup(
     name='HklEnv', 
+    packages= find_packages(), 
     version='0.0.1', 
-    packages=packages, 
     install_requires=['gym', 'baselines'],
-)
+    dependency_links=['git://github.com/scattering/baselines'],
+    )
+
