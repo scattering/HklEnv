@@ -1,33 +1,34 @@
-import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
-
-from os import path
 import os
-import gym 
-from baselines import spaces as base_spaces 
-from gym import spaces as gym_spaces 
-from gym.utils import seeding
+from os import path
 from copy import copy
-import numpy as np
 import random as rand
 import pickle
 import itertools
+
+import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-import fswig_hklgen as H
-import hkl_model as Mod
-import sxtal_model as S
+import gym
+from gym.utils import seeding
+from gym.spaces import Discrete
+from baselines.spaces import Bin_Discrete
+import hklgen
 
 from HklEnv.envs.test_bumps_refl import better_bumps
 
+DATAPATH = os.environ.get('HKL_DATAPATH', None)
+if DATAPATH is None:
+    DATAPATH = os.path.join(os.path.abspath(os.path.dirname(hklgen.__file__)),
+                            'examples', 'sxtal')
+                            
 class HklEnv(gym.Env):
 
     def __init__(self, reward_scale=100, storspot = "ppodat"):
         self.reward_scale=reward_scale
-        print("envmade")
-        import sys; sys.stdout.flush()
-        DATAPATH = os.path.abspath(os.path.expanduser("~/pycrysfml/hklgen/examples/sxtal"))
+        print("Loading problem from %r. Set HklEnv.hkl.DATAPATH"
+              " or os.environ['HKL_DATAPATH'] to override." % DATAPATH)
         observedFile = os.path.join(DATAPATH,r"prnio.int")
         infoFile = os.path.join(DATAPATH,r"prnio.cfl")
 
@@ -45,8 +46,8 @@ class HklEnv(gym.Env):
         self.exclusions = []
         
         #Set up action space and observation space (in forked baselines)
-        self.observation_space = base_spaces.Bin_Discrete(len(self.refList))
-        self.action_space = gym_spaces.Discrete(len(self.refList))
+        self.observation_space = Bin_Discrete(len(self.refList))
+        self.action_space = Discrete(len(self.refList))
         
         #Graphing and logging arrays
         self.storspot = "/wrk/kmm11/" + storspot
@@ -170,6 +171,7 @@ class HklEnv(gym.Env):
         self.valid_actions = np.ones(shape = (5, len(self.refList)))
         self.remainingActions = []
         
+        #TODO remove hardcoded 
         self.remaining_acs = np.zeros(198)
         for i in range (0, 198):
             self.remaining_acs[i] = i

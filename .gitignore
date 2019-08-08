@@ -42,3 +42,6 @@ Thumbs.db
 *.dyld
 *.pyc
 __pycache__
+/src
+/dist
+/build
