@@ -64,7 +64,7 @@ def findmin(x,y,npeaks):
         best_index = indices[max_index]
         print('>>>>>>>>>>>>>>>best', best_index)
     else:
-        best_index = 0
+        best_index = [0]
 
     return best_index
 
