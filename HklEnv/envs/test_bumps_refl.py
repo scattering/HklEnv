@@ -1,25 +1,9 @@
-import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
 import bumps.names as bumps 
 import bumps.fitters as fitters
-import bumps.lsqerror as lsqerror
-from bumps.formatnum import format_uncertainty_pm
 
 import numpy as np
 
-import fswig_hklgen as H
-import hkl_model as Mod
-import sxtal_model as S
-import sys; sys.stdout.flush()
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.axes as axes
-
-import random
-from random import seed
-from random import sample
-from random import randint
-from HklEnv.envs.find_min import findmin
+from .find_min import findmin
 
 def better_bumps(model):
 

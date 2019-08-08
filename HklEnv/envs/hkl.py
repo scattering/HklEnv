@@ -14,7 +14,11 @@ import gym
 from gym.utils import seeding
 from gym.spaces import Discrete
 from baselines.spaces import Bin_Discrete
+
 import hklgen
+from hklgen import fswig_hklgen as H
+from hklgen import hkl_model as Mod
+from hklgen import sxtal_model as S
 
 from HklEnv.envs.test_bumps_refl import better_bumps
 
@@ -22,10 +26,14 @@ DATAPATH = os.environ.get('HKL_DATAPATH', None)
 if DATAPATH is None:
     DATAPATH = os.path.join(os.path.abspath(os.path.dirname(hklgen.__file__)),
                             'examples', 'sxtal')
+
+STOREPATH = os.environ.get('HKL_STOREPATH', None)
+if STOREPATH is None:
+    STOREPATH = "."
                             
 class HklEnv(gym.Env):
 
-    def __init__(self, reward_scale=100, storspot = "ppodat"):
+    def __init__(self, reward_scale=100):
         self.reward_scale=reward_scale
         print("Loading problem from %r. Set HklEnv.hkl.DATAPATH"
               " or os.environ['HKL_DATAPATH'] to override." % DATAPATH)
@@ -50,7 +58,7 @@ class HklEnv(gym.Env):
         self.action_space = Discrete(len(self.refList))
         
         #Graphing and logging arrays
-        self.storspot = "/wrk/kmm11/" + storspot
+        self.storspot = STOREPATH
         self.rewards = []
         self.hkls = []
         self.zs = []

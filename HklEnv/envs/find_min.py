@@ -1,12 +1,11 @@
-import os,sys;sys.path.append(os.path.abspath("/home/kmm11/pycrysfml/hklgen/"))
-import numpy as N
-import pylab
-import matplotlib.pyplot as plt
-from .sgolay import savitzky_golay as savitzky_golay
-import sys
-import scipy.interpolate as interpolate
 import csv
 import random
+
+import numpy as N
+import scipy.interpolate as interpolate
+
+from .sgolay import savitzky_golay as savitzky_golay
+
 pi=N.pi
 
 def findmin(x,y,npeaks):
@@ -80,15 +79,14 @@ def matlab_gaussian(x,p):
     y = (area/N.sqrt(2.0*pi*sig**2))*N.exp(-0.5*((x-center)/sig)**2);
     return y
 
-if __name__=="__main__":
-    
+def main():
+    import matplotlib.pyplot as plt
     with open('/home/jpr6/logs/bumps_tests/75/dat_random_set14.csv') as f:
         reader = csv.reader( f, delimiter = ',')
         table = [row for row in reader]
         table = N.float_(table)
         x = table[0]
         y = table[1]
-    
     
     xpeaks = findmin(x,y,10)
     if 1:
@@ -97,4 +95,6 @@ if __name__=="__main__":
         ax.set_xticks(x[xpeaks], minor=False)
         ax.xaxis.grid (True, which = 'major')
         plt.show()
-   
+        
+if __name__=="__main__":
+    main()
