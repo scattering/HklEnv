@@ -1,6 +1,7 @@
 import os
 from os import path
 from copy import copy
+# this messes up your merge
 import random as rand
 import pickle
 import itertools
@@ -163,7 +164,10 @@ class HklEnv(gym.Env):
 
         #Set a range on the x value of the first atom in the model
         self.model.atomListModel.atomModels[0].z.value = 0.25
-        self.model.atomListModel.atomModels[0].z.range(0,0.5)
+        self.model.atomListModel.atomModels[0].z.range(0,0.45)
+        # TODO this
+        self.model.atomListModel.atomModels[5].x.range(0,.2)
+        self.model.atomListModel.atomModels[5].y.range(0,0.45)
 
         self.visited = []
         self.observed = []
