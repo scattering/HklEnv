@@ -1,7 +1,6 @@
 import os
 from os import path
 from copy import copy
-# this messes up your merge
 import random as rand
 import pickle
 import itertools
