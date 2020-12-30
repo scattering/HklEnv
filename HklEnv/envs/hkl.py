@@ -1,9 +1,10 @@
 import os
 from os import path
 from copy import copy
-import random as rand
+# Git test
+import random as randimport itertools
+
 import pickle
-import itertools
 
 import numpy as np
 import matplotlib as mpl
