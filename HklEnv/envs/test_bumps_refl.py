@@ -2,10 +2,9 @@ import bumps.names as bumps
 import bumps.fitters as fitters
 
 def better_bumps(model):
-    model.update()
     problem = bumps.FitProblem(model)
 
-    result = fitters.fit(problem, method='dream')
+    result = fitters.fit(problem, method='lm')
     for p, v in zip(problem._parameters, result.dx):
         p.dx = v
 

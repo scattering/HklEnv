@@ -115,6 +115,8 @@ class HklEnv(gym.Env):
             #print("about to fit")
             
             x, dx, chisq, params = better_bumps(self.model)
+
+            self.model.update()
             
             dz=params[0].dx
             
