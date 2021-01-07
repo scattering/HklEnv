@@ -162,13 +162,16 @@ class HklEnv(gym.Env):
                     scale=0.06298, error=[],  extinction=[0.0001054])
 
         #Set a range on the x value of the first atom in the model
-        self.model.atomListModel.atomModels[0].z.value = 0.25
+        #self.model.atomListModel.atomModels[0].z.value = 0.25
+        self.model.atomListModel.atomModels[0].z.value = .35973
+        self.model.atomListModel.atomModels[5].x.value = .07347
+        self.model.atomListModel.atomModels[5].y.value = .07347
         self.model.atomListModel.atomModels[0].z.range(0,0.45)
 
-        self.model.atomListModel.atomModels[5].x.value = 0.1
+        #self.model.atomListModel.atomModels[5].x.value = 0.1
         self.model.atomListModel.atomModels[5].x.range(0,0.2)
 
-        self.model.atomListModel.atomModels[5].y.value = 0.1
+        #self.model.atomListModel.atomModels[5].y.value = 0.1
         self.model.atomListModel.atomModels[5].y.range(0,0.2)
 
         self.visited = []
