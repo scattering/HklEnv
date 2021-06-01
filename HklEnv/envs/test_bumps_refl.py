@@ -1,10 +1,6 @@
 import bumps.names as bumps
 import bumps.fitters as fitters
 
-import numpy as np
-
-from .find_min import findmin
-
 def better_bumps(model):
 
     zin=[]
@@ -21,8 +17,8 @@ def better_bumps(model):
     #     nllfs.append(schi)
     #     zin.append(zs)
 
-    xpeaks = findmin(zin,nllfs,10)
-    print('xpeak', xpeaks)
+    # xpeaks = findmin(zin,nllfs,10)
+    # print('xpeak', xpeaks)
     # these are experimental values, shortcut
     model.atomListModel.atomModels[0].z.value = .35973
     model.atomListModel.atomModels[5].x.value = .07347
