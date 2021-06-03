@@ -21,28 +21,33 @@ def better_bumps(model):
 
 def chi_surface(model):
     xin = []
+    yin = []
     chis = []
 
-    for xs in np.arange(.05, .45, .005):
-        model.atomListModel.atomModels[5].y.value = xs
-        model.update()
-        xin.append(xs)
-        try:
-            problem = bumps.FitProblem(model)
-        except:
-            print("ERROR AT:" + xs)
+    for xs in np.arange(.05, .45, .01):
+        for ys in np.arange(.05, .45, .01):
+            model.atomListModel.atomModels[5].x.value = xs
+            model.atomListModel.atomModels[5].y.value = ys
+            model.update()
+            xin.append(xs)
+            yin.append(ys)
+            try:
+                problem = bumps.FitProblem(model)
+            except:
+                print("ERROR AT:" + xs)
 
-        result = fitters.fit(problem, method='lm')
-        for p, v in zip(problem._parameters, result.dx):
-            p.dx = v
+            result = fitters.fit(problem, method='lm')
+            for p, v in zip(problem._parameters, result.dx):
+                p.dx = v
 
-        chis.append(problem.chisq())
+            chis.append(problem.chisq())
 
-    return xin, chis
+    return xin, yin, chis
 
 def graph(model):
-    xin, chis = chi_surface(model)
-    plt.plot(xin, chis, 'bo')
+    xin, yin, chis = chi_surface(model)
+    ax = plt.axes(projection='3d')
+    ax.plot(xin, yin, chis, 'bo')
     plt.axvline(x=0.07347)
     plt.ylabel("chi squared")
     plt.xlabel("Oy estimated value")
