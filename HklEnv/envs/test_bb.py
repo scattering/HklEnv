@@ -2,8 +2,9 @@ import sys
 
 import numpy as np
 import matplotlib as mpl
+from bumps.parameter import Parameter
+
 mpl.use('Agg')
-import matplotlib.pyplot as plt
 
 sys.path.append("/home/kaet/gen/nist/pycrysfml")
 
@@ -58,23 +59,23 @@ model = S.Model([], [], backg, wavelength, spaceGroup, cell,
                      scale=0.06298, error=[], extinction=[0.0001054])
 
 # Set a range on the x value of the first atom in the model
-# model.atomListModel.atomModels[0].z.value = 0.25
-# model.atomListModel.atomModels[0].z.range(0, 0.45)
+model.atomListModel.atomModels[0].z.value = 0.25
+model.atomListModel.atomModels[0].z.range(0, 0.45)
 
 model.atomListModel.atomModels[5].x.value = 0.1
 model.atomListModel.atomModels[5].x.range(0, 0.2)
 
-model.atomListModel.atomModels[5].y.value = 0.1
-model.atomListModel.atomModels[5].y.range(0, 0.2)
+model.atomListModel.atomModels[5].y = model.atomListModel.atomModels[5].x
+# model.atomListModel.atomModels[5].y.range(0, 0.2)
 
 model.update()
 
 actions = np.zeros(198)
 
 
-for i in range(20):
-    step(np.random.randint(0, 198)) # randomly pick action
-    # step(i)
+for i in range(198):
+    # step(np.random.randint(0, 198)) # randomly pick action
+    step(i)
 
 
 # step(83)
