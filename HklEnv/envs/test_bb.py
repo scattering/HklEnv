@@ -63,10 +63,11 @@ model.atomListModel.atomModels[0].z.value = 0.25
 model.atomListModel.atomModels[0].z.range(0, 0.45)
 
 model.atomListModel.atomModels[5].x.value = 0.1
-model.atomListModel.atomModels[5].x.range(0, 0.2)
+model.atomListModel.atomModels[5].x.range(0, 0.4)
 
-model.atomListModel.atomModels[5].y = model.atomListModel.atomModels[5].x
-# model.atomListModel.atomModels[5].y.range(0, 0.2)
+#model.atomListModel.atomModels[5].y = model.atomListModel.atomModels[5].x
+model.atomListModel.atomModels[5].y.value = 0.1
+model.atomListModel.atomModels[5].y.range(0, 0.4)
 
 model.update()
 
