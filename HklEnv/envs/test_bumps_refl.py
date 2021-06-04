@@ -20,21 +20,19 @@ def better_bumps(model):
 
 
 def chi_surface(model):
-    xin = []
-    yin = []
+    ys = []
+    ys_nans = []
     chis = []
     xs = []
     dxs = []
     xs_nans = []
     chis_nans = []
 
-    for x in np.arange(0, 0.5, .05):
-        for y in np.arange(0, .5, .01):
+    for x in np.arange(0, 0.5, .02):
+        for y in np.arange(0, .5, .02):
             model.atomListModel.atomModels[5].x.value = x
             model.atomListModel.atomModels[5].y.value = y
             model.update()
-            xin.append(x)
-            yin.append(y)
             try:
                 problem = bumps.FitProblem(model)
             except:
@@ -48,31 +46,44 @@ def chi_surface(model):
 
             if True in nans:
                 xs_nans.append(result.x[0])
+                ys_nans.append(result.x[1])
                 chis_nans.append(chi)
 
             else:
                 dxs.append(result.dx[0])
                 xs.append(x)
+                ys.append(y)
                 chis.append(chi)
 
 
-    return xin, yin, chis, nans, chis_nans, xs, dxs, xs_nans
+    return chis, nans, chis_nans, xs, dxs, xs_nans, ys, ys_nans
 
 def graph(model):
-    xin, yin, chis, nans, chis_nans, xs, dxs, xs_nans = chi_surface(model)
-    #ax = plt.axes(projection='3d')
+    chis, nans, chis_nans, xs, dxs, xs_nans, ys, ys_nans = chi_surface(model)
 
-    plt.plot(yin, chis, 'bo')
-    plt.axvline(x=0.07347)
+    ax = plt.axes(projection='3d')
+    ax.plot(ys, xs, chis, 'bo')
+    plt.scatter(ys_nans, xs_nans, chis_nans, c='red')
+    print(xs_nans)
+    print(ys_nans)
     plt.ylabel("chi squared")
     plt.xlabel("Ox estimated value")
     plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/test.png")
+    plt.close()
+
+    plt.plot(ys, chis, 'bo')
+    plt.scatter(ys_nans, chis_nans, c='red')
+    plt.axvline(x=0.07347)
+    plt.ylabel("chi squared")
+    plt.xlabel("Oy estimated value")
+    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/testy.png")
     plt.close()
 
     # print("xs:", xs)
     # print("chis:", chis)
     plt.scatter(xs, chis, c='blue')
     plt.scatter(xs_nans, chis_nans, c='red')
+    plt.axvline(x=0.07347)
     plt.xlabel("oxygen x value")
     plt.ylabel("chi")
     plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/testx.png")
