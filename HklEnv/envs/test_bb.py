@@ -2,7 +2,8 @@ import sys
 
 import numpy as np
 import matplotlib as mpl
-from bumps.parameter import Parameter
+import bumps.names as bumps
+from bumps import fitters
 
 mpl.use('Agg')
 
@@ -59,37 +60,78 @@ model = S.Model([], [], backg, wavelength, spaceGroup, cell,
                      scale=0.06298, error=[], extinction=[0.0001054])
 
 # Set a range on the x value of the first atom in the model
-model.atomListModel.atomModels[0].z.value = 0.25
-model.atomListModel.atomModels[0].z.range(0, 0.45)
+# model.atomListModel.atomModels[0].z.value = 0.25
+# model.atomListModel.atomModels[0].z.range(0, 0.45)
 
-model.atomListModel.atomModels[5].x.value = 0.1
-model.atomListModel.atomModels[5].x.range(0, 0.4)
+# model.atomListModel.atomModels[5].x.value = 0
+# model.atomListModel.atomModels[5].x.range(0, 0.4)
+#
+# # model.atomListModel.atomModels[5].y = model.atomListModel.atomModels[5].x
+# model.atomListModel.atomModels[5].y.value = 0
+# model.atomListModel.atomModels[5].y.range(0, 0.4)
+#
+# model.atomListModel.atomModels[5].z.value = 0.17349
+# model.atomListModel.atomModels[5].z.range(0.16, 0.18)
 
-#model.atomListModel.atomModels[5].y = model.atomListModel.atomModels[5].x
-model.atomListModel.atomModels[5].y.value = 0.1
-model.atomListModel.atomModels[5].y.range(0, 0.4)
+model.atomListModel.atomModels[3].z.value = 0.2
+model.atomListModel.atomModels[3].z.range(0, 0.5)
+
+model.atomListModel.atomModels[3].occ.value = 0
+model.atomListModel.atomModels[3].occ.range(1.0, 2.0)
+
+model.atomListModel.atomModels[4].occ.value = 0
+model.atomListModel.atomModels[4].occ.range(0, 1.0)
+
+model.atomListModel.atomModels[5].x.value = 0.2
+model.atomListModel.atomModels[5].x.range(0, 0.5)
+model.atomListModel.atomModels[5].y.value = 0.2
+model.atomListModel.atomModels[5].y.range(0, 0.5)
+model.atomListModel.atomModels[5].z.value = 0.2
+model.atomListModel.atomModels[5].z.range(0, 0.5)
+
+model.atomListModel.atomModels[5].occ.value = 0
+model.atomListModel.atomModels[5].occ.range(0, 1.0)
+
+loadRefl = False
 
 model.update()
 
 actions = np.zeros(198)
 
+if loadRefl == True:
+    for i in range(198):
+        # step(np.random.randint(0, 198)) # randomly pick action
+        step(i)
+else:
+    actions = np.arange(0, 198, 1)
 
-for i in range(198):
-    # step(np.random.randint(0, 198)) # randomly pick action
-    step(i)
+    for action in actions:
+        visited.append(refList[int(action)])
 
+    model.refList = H.ReflectionList(visited)
+    model._set_reflections()
 
-# step(83)
-# step(88)
-# step(148)
-# step(18)
+    for action in actions:
+        model.error.append(error[int(action)])
+        model.tt = np.append(model.tt, [tt[int(action)]])
 
-# step(145)
-# step(19)
-# step(105)
-# step(183)
-# step(109)
-# step(57)
+    for action in actions:
+        observed.append(sfs2[int(action)])
+
+    model._set_observations(observed)
+    model.update()
+
+    problem = bumps.FitProblem(model)
+    result = fitters.fit(problem, method='dream', store="/home/kaet/gen/nist/HklEnv/HklEnv/envs")
+    for p, v in zip(problem._parameters, result.dx):
+        p.dx = v
+
+    print("1)")
+    print("result:", result.x)
+    print("uncertainty:", result.dx)
+    print("chisq:", problem.chisq())
+    print("params:", problem._parameters)
+    print()
 
 graph(model)
 
