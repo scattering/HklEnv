@@ -68,7 +68,7 @@ def graph(model):
     print(ys_nans)
     plt.ylabel("chi squared")
     plt.xlabel("Ox estimated value")
-    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/test.png")
+    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/chisurface.png")
     plt.close()
 
     plt.plot(ys, chis, 'bo')
@@ -76,7 +76,7 @@ def graph(model):
     plt.axvline(x=0.07347)
     plt.ylabel("chi squared")
     plt.xlabel("Oy estimated value")
-    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/testy.png")
+    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/ychi.png")
     plt.close()
 
     # print("xs:", xs)
@@ -86,7 +86,7 @@ def graph(model):
     plt.axvline(x=0.07347)
     plt.xlabel("oxygen x value")
     plt.ylabel("chi")
-    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/testx.png")
+    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/xchi.png")
     plt.close()
 
     plt.scatter(xs, dxs, c='blue')
@@ -111,5 +111,5 @@ def graph(model):
     plt.xlabel("oxygen x value")
     plt.ylabel("uncertainty")
     plt.title("Oxygen x uncertainty without 1e8 values")
-    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/x_new_uncertainty.png")
+    plt.savefig("/home/kaet/gen/nist/HklEnv/HklEnv/envs/x_uncertainty_no1e8.png")
     plt.close()
