@@ -3,16 +3,15 @@ import sys
 import numpy as np
 import bumps.names as bumps
 
-sys.path.insert(0, "/home/jessi/NIST/pycrysfml")
-print(sys.path)
+sys.path.append("/home/kaet/gen/nist/pycrysfml")
 
 from hklgen import fswig_hklgen as H
 from hklgen import hkl_model as Mod
 from hklgen import sxtal_model as S
 
 # TODO: unhardcode if sharing code
-observedFile = "/home/jessi/NIST/pycrysfml/hklgen/examples/sxtal/prnio.int"
-infoFile = "/home/jessi/NIST/pycrysfml/hklgen/examples/sxtal/prnio.cfl"
+observedFile = "/home/kaet/gen/nist/pycrysfml/hklgen/examples/sxtal/prnio.int"
+infoFile = "/home/kaet/gen/nist/pycrysfml/hklgen/examples/sxtal/prnio.cfl"
 
 # Read data
 spaceGroup, crystalCell, atomList = H.readInfo(infoFile)
@@ -43,20 +42,20 @@ model.atomListModel.atomModels[3].z.value = 0.2
 model.atomListModel.atomModels[3].z.range(0, 0.5)
 
 model.atomListModel.atomModels[3].occ.value = 0
-model.atomListModel.atomModels[3].occ.range(1.0, 2.0)
+model.atomListModel.atomModels[3].occ.range(1.8, 3.0)
 
-model.atomListModel.atomModels[4].occ.value = 0
-model.atomListModel.atomModels[4].occ.range(0, 1.0)
+model.atomListModel.atomModels[4].occ.value = 0.3
+model.atomListModel.atomModels[4].occ.range(0, 2.0)
 
 model.atomListModel.atomModels[5].x.value = 0.2
 model.atomListModel.atomModels[5].x.range(0, 0.5)
 model.atomListModel.atomModels[5].y.value = 0.2
 model.atomListModel.atomModels[5].y.range(0, 0.5)
-model.atomListModel.atomModels[5].z.value = 0.2
-model.atomListModel.atomModels[5].z.range(0, 0.5)
+model.atomListModel.atomModels[5].z.value = 0.1
+model.atomListModel.atomModels[5].z.range(-0.2, 0.3)
 
 model.atomListModel.atomModels[5].occ.value = 0
-model.atomListModel.atomModels[5].occ.range(0, 1.0)
+model.atomListModel.atomModels[5].occ.range(.8, 8.0)
 
 model.update()
 
