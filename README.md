@@ -70,6 +70,14 @@ Normally this command would be part of a slurm batch script, run.sh:
 submit using
 
     sbatch run.sh
+    
+## Using DREAM
+
+Currently, the fit in this model uses the Marquardt-Levenburg method. If you'd like to use a more comprehensive fitting method, you'll need to add a patch to the bumps library, which can be found [here](https://github.com/bumps/bumps/pull/68).
+
+With that patch, you can call dream directly from within the test_bumps_refl.py file. You should update the code on line 33 to look something like this:
+
+       result = fitters.fit(problem, method='dream', name='demo', store='/home/output')
 
 ## Problems
 
